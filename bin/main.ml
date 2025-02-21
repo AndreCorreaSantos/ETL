@@ -1,4 +1,4 @@
-open ETL.Impure
+open Etl.Impure
 
 let sample_csv =
   {|"id","name","color",
