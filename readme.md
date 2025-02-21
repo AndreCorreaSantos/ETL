@@ -4,9 +4,16 @@
 
 ### 3 create types to store data
 
-
-
-
 #### Notas:
 
 Fazer group by da tabela Order_item pela coluna order_id para obter os itens de cada order.
+
+dados necessarios:
+
+item:
+
+    quantity
+
+    price
+
+    tax
