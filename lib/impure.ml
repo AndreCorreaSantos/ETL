@@ -2,51 +2,69 @@
 let ( let* ) = Result.bind
 
 (* Core types *)
-type color = Red | Yellow | Blue
+type status = Complete | Pending | Cancelled
 
-type fruit = {
+type origin = P | O 
+
+type order = {
   id : int;
-  name : string;
-  color : color;
+  client_id : int;
+  order_date : string;
+  status : status; 
+  origin : origin;
 }
 
-(* String representation of colors *)
-let show_color = function
-  | Red -> "Red"
-  | Yellow -> "Yellow"
-  | Blue -> "Blue"
+(* String representation of types *)
+let show_status = function
+  | Complete -> "Complete"
+  | Pending -> "Pending"
+  | Cancelled -> "Cancelled"
+
+  let show_origin = function
+  | O -> "O" (*online vs physical *)
+  | P -> "P"
 
 (* Parsing functions returning Results *)
-let parse_color = function
-  | "Red" -> Ok Red
-  | "Yellow" -> Ok Yellow
-  | "Blue" -> Ok Blue
-  | _ -> Error `Unknown_color
+let parse_status = function
+  | "Complete" -> Ok Complete
+  | "Pending" -> Ok Pending
+  | "Cancelled" -> Ok Cancelled
+  | _ -> Error `Unknown_status
+
+let parse_origin = function
+  | "O" -> Ok O
+  | "P" -> Ok P
+  | _ -> Error `Unknown_origin
 
 let parse_id raw_id =
   raw_id
   |> int_of_string_opt
   |> Option.to_result ~none:`Invalid_id
 
-let parse_name = function
-  | "" -> Error `Missing_name
-  | n -> Ok n
+let parse_date raw_date = Ok raw_date (*come back for proper date format checking later*)
 
-(* Parse a CSV row into a fruit record *)
+(* Parse a CSV row into an order record *)
 let parse_row row =
+
   let* id =
     Csv.Row.find row "id" |> parse_id
   in
-  let* name =
-    Csv.Row.find row "name" |> parse_name
+  let* client_id =
+    Csv.Row.find row "client_id" |> parse_id
   in
-  let* color =
-    Csv.Row.find row "color" |> parse_color
+  let* order_date = 
+    Csv.Row.find row "order_date" |> parse_date
   in
-  Ok { id; name; color }
+  let* status  = 
+    Csv.Row.find row "status" |> parse_status
+  in
+  let* origin = 
+    Csv.Row.find row "origin" |> parse_origin
+  in
+  Ok { id; client_id; order_date; status; origin}
 
-(* Parse CSV string into list of fruit results *)
-let parse_fruits csv_str =
+(* Parse CSV string into list of order results *)
+let parse_orders csv_str =
   csv_str
   |> Csv.of_string ~has_header:true
   |> Csv.Rows.input_all
