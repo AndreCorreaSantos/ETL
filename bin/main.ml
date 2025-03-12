@@ -14,13 +14,13 @@ let () = print_items items *)
 
 let results = get_results orders items
 
-
+(* 
 let () = Printf.printf "%i \n" (List.hd results).order_id
 
-let () = Printf.printf "%f \n" (List.hd results).price
+let () = Printf.printf "%f \n" (List.hd results).price *)
 
 
 
 
-let () = ignore results
+let () = write_file "data/result.csv" results
 

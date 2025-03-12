@@ -1,18 +1,4 @@
-(* 
-module StringMap = Map.Make(String) *)
-
-(* dicionario, chave é o id da order, valor é uma lista de itens  *)
-
-(* let inner_join orders items =
-  let map = StringMap.empty in
-  let rec fill_map lst =
-    match lst with
-    | [] -> []
-    | h :: t -> StringMap.add h.order_id *)
-
 open Types
-
-
 
 let get_results orders items =
   (* filter items for order*)

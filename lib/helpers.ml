@@ -55,3 +55,18 @@ let read_file filename =
   let content = really_input_string channel (in_channel_length channel) in
   close_in channel;
   content
+
+  let write_file results filename =
+    let header = ["order_id"; "price"; "tax"] in
+    let result_to_row result =
+      [
+        string_of_int result.order_id;
+        string_of_float result.price;
+        string_of_float result.tax;
+      ]
+    in
+    let rows = List.map result_to_row results in
+    let channel = open_out filename in
+    Csv.to_channel ~separator:';' ~quote_all:true channel (header :: rows)
+  
+
