@@ -22,8 +22,8 @@ type order = {
 
 type result = {
   order_id : int;
-  price : int;
-  tax : int;
+  price : float;
+  tax : float;
 }
 
 type item = {
