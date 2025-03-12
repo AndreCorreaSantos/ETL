@@ -1,31 +1,46 @@
-(* Cleaner syntax for Result.bind *)
+open Types
+
 let ( let* ) = Result.bind
 
-(* Core types *)
-type status = Complete | Pending | Cancelled
+(* parse orders *)
 
-type origin = P | O 
+let parse_int raw_int =
+  raw_int
+  |> int_of_string_opt
+  |> Option.to_result ~none:`Invalid_int
 
-type order = {
-  id : int;
-  client_id : int;
-  order_date : string;
-  status : status; 
-  origin : origin;
-}
+let parse_float raw_float =
+  raw_float
+  |> float_of_string_opt
+  |> Option.to_result ~none:`Invalid_float
 
-(* String representation of types *)
-let show_status = function
-  | Complete -> "Complete"
-  | Pending -> "Pending"
-  | Cancelled -> "Cancelled"
+let parse_date raw_date = Ok raw_date 
 
-  let show_origin = function
-  | O -> "O" (*online vs physical *)
-  | P -> "P"
+let parse_row row =
 
-(* Parsing functions returning Results *)
-let parse_status = function
+  let* order_id =
+    Csv.Row.find row "order_id" |> parse_int
+  in
+  let* quantity =
+    Csv.Row.find row "quantity" |> parse_int
+  in
+  let* price = 
+    Csv.Row.find row "price" |> parse_float
+  in
+  let* tax  = 
+    Csv.Row.find row "tax" |> parse_float
+  in
+  Ok { order_id;quantity;price;tax}
+
+(* Parse items *)
+let parse_items csv_str =
+  csv_str
+  |> Csv.of_string ~has_header:true
+  |> Csv.Rows.input_all
+  |> List.map parse_row
+
+
+  let parse_status = function
   | "Complete" -> Ok Complete
   | "Pending" -> Ok Pending
   | "Cancelled" -> Ok Cancelled
@@ -41,9 +56,7 @@ let parse_id raw_id =
   |> int_of_string_opt
   |> Option.to_result ~none:`Invalid_id
 
-let parse_date raw_date = Ok raw_date (*come back for proper date format checking later*)
 
-(* Parse a CSV row into an order record *)
 let parse_row row =
 
   let* id =
@@ -63,7 +76,6 @@ let parse_row row =
   in
   Ok { id; client_id; order_date; status; origin}
 
-(* Parse CSV string into list of order results *)
 let parse_orders csv_str =
   csv_str
   |> Csv.of_string ~has_header:true

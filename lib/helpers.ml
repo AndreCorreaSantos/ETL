@@ -1,5 +1,4 @@
-open Item
-open Order
+open Types
 
 let print_items items = List.iter (function
   | Ok item ->
@@ -31,6 +30,13 @@ let print_orders orders =  List.iter (function
   | Error `Unknown_origin ->
       print_endline "Unknown_origin"
     ) orders
+
+
+let unwrap_orders order_results =
+  List.filter_map (function
+    | Ok order -> Some order
+    | Error _ -> None) 
+  order_results
 
 let read_file filename =
   let channel = open_in filename in
