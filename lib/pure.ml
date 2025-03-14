@@ -6,10 +6,10 @@ let get_results orders items =
     List.filter (fun it -> it.order_id = order.id) items 
   in
   
-  (* result record from items *)
+  (* calculate result record from items *)
   let result_from_items order items_for_order =
     let total_price = List.fold_left (fun acc it -> acc +. it.price *. float_of_int it.quantity) 0. items_for_order in
-    let total_tax = List.fold_left (fun acc it -> acc +. it.tax *. float_of_int it.quantity) 0. items_for_order in
+    let total_tax = List.fold_left (fun acc it -> acc +. it.tax *. total_price) 0. items_for_order in
     { order_id = order.id; price = total_price; tax = total_tax }
   in
   List.map (fun order -> 

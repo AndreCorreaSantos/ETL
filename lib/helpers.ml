@@ -56,9 +56,9 @@ let read_file filename =
   close_in channel;
   content
 
-  let write_file results filename =
+  let write_file (filename : string) (results : result list) =
     let header = ["order_id"; "price"; "tax"] in
-    let result_to_row result =
+    let result_to_row (result : result) =
       [
         string_of_int result.order_id;
         string_of_float result.price;
@@ -66,7 +66,22 @@ let read_file filename =
       ]
     in
     let rows = List.map result_to_row results in
+    
     let channel = open_out filename in
-    Csv.to_channel ~separator:';' ~quote_all:true channel (header :: rows)
+    
+    (* format string to csv line *)
+    let row_to_csv_line row =
+      let quote s = "\"" ^ String.escaped s ^ "\"" in
+      String.concat ";" (List.map quote row) ^ "\n"
+    in
+    
+    (* write header and rows *)
+    output_string channel (row_to_csv_line header);
+    List.iter (fun row -> output_string channel (row_to_csv_line row)) rows;
+    
+    close_out channel
+
+
+
   
 
