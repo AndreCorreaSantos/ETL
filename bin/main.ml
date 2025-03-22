@@ -12,7 +12,9 @@ let items = unwrap_items (parse_items item_csv)
 (* let () = print_orders orders
 let () = print_items items *)
 
-let results = get_results orders items
+let _ = inner_join items orders
+
+(* let results = get_results orders items *)
 
 (* 
 let () = Printf.printf "%i \n" (List.hd results).order_id
@@ -22,5 +24,5 @@ let () = Printf.printf "%f \n" (List.hd results).price *)
 
 
 
-let () = write_file "data/result.csv" results
+(* let () = write_file "data/result.csv" results *)
 

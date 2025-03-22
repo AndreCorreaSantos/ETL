@@ -1,6 +1,18 @@
 open Types
 
-let get_results orders items =
+
+let inner_join items orders = 
+  let get_order item = 
+    let order = List.find (fun order -> order.id = item.order_id) orders in
+    { order_id = order.id; client_id = order.client_id; 
+  order_date = order.order_date; status = order.status; origin = order.origin }
+
+  in 
+  List.map get_order items 
+  
+
+
+(* let get_results orders items =
   (* filter items for order*)
   let order_items order items = 
     List.filter (fun it -> it.order_id = order.id) items 
@@ -16,6 +28,6 @@ let get_results orders items =
     let items_for_order = order_items order items in
     result_from_items order items_for_order
   ) orders
-
+ *)
 
 
