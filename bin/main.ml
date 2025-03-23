@@ -9,20 +9,10 @@ let orders = unwrap_orders (parse_orders order_csv)
 
 let items = unwrap_items (parse_items item_csv)
 
-(* let () = print_orders orders
-let () = print_items items *)
-
 let inter_result = inner_join items orders
 
 let results = get_results inter_result
 
-(* 
-let () = Printf.printf "%i \n" (List.hd results).order_id
 
-let () = Printf.printf "%f \n" (List.hd results).price *)
-
-
-
-
-let () = write_file "data/result.csv" results
+let () = write_file "data/result.csv" (List.rev results)
 

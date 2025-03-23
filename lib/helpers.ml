@@ -31,13 +31,6 @@ let print_orders orders =  List.iter (function
       print_endline "Unknown_origin"
     ) orders
 
-(* let print_result result = 
-  Printf.printf "%d %f %f\n"
-    result.order_id
-    result.price
-    result.tax *)
-
-
 let unwrap_orders order_results =
   List.filter_map (function
     | Ok order -> Some order
