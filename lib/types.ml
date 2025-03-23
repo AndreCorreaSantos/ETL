@@ -20,19 +20,14 @@ type order = {
   origin : origin;
 }
 
-type int_result = {
-  order_id : int;
-  client_id : int;
-  order_date : string;
-  status : status; 
-  origin : origin;
-}
 
 type result = {
   order_id : int;
   price : float;
   tax : float;
 }
+
+
 
 type item = {
   order_id : int;
@@ -41,4 +36,13 @@ type item = {
   tax: float;
 }
 
-
+type int_result = {
+  order_id : int;
+  client_id : int;
+  order_date : string;
+  status : status; 
+  origin : origin;
+  quantity: int;
+  price : float;
+  tax : float;
+}

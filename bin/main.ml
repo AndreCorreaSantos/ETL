@@ -24,5 +24,5 @@ let () = Printf.printf "%f \n" (List.hd results).price *)
 
 
 
-(* let () = write_file "data/result.csv" results *)
+let () = write_file "data/result.csv" results
 
