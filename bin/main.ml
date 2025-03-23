@@ -12,9 +12,9 @@ let items = unwrap_items (parse_items item_csv)
 (* let () = print_orders orders
 let () = print_items items *)
 
-let _ = inner_join items orders
+let inter_result = inner_join items orders
 
-(* let results = get_results orders items *)
+let results = get_results inter_result
 
 (* 
 let () = Printf.printf "%i \n" (List.hd results).order_id
