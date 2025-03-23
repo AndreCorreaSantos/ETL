@@ -105,6 +105,25 @@ let http_get_string url =
   )
 
 
+let create_table (db : Sqlite3.db) = 
+  match Sqlite3.exec db "CREATE TABLE IF NOT EXISTS results (order_id INTEGER PRIMARY KEY, price FLOAT, tax FLOAT)" with
+  | Sqlite3.Rc.OK -> ()  
+  | err ->
+    Printf.printf "Failed creating sqlite results db: %s\n" (Sqlite3.Rc.to_string err);
+    exit 1
 
-  
+let insert_result (db : Sqlite3.db) (result : result) = 
+  let statement = Sqlite3.prepare db "INSERT INTO results (order_id, price, tax) VALUES (?, ?, ?)" in
+  Sqlite3.bind statement 1 (Sqlite3.Data.INT (Int64.of_int result.order_id)) |> ignore;  
+  Sqlite3.bind statement 2 (Sqlite3.Data.FLOAT result.price) |> ignore;
+  Sqlite3.bind statement 3 (Sqlite3.Data.FLOAT result.tax) |> ignore;  
+  Sqlite3.step statement |> ignore;
+  Sqlite3.finalize statement |> ignore;
+  ()
 
+let write_to_sqlite (filename : string) (results : result list) = 
+  let db = Sqlite3.db_open filename in
+  let () = create_table db in 
+  List.iter (fun result -> insert_result db result) results;
+  Sqlite3.db_close db |> ignore;
+  ()

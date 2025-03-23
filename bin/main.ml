@@ -12,8 +12,12 @@ let items = unwrap_items (parse_items item_csv)
 
 let inter_result = inner_join items orders
 
-let results = get_results inter_result
+let results = List.rev (get_results inter_result)
 
 
-let () = write_file "data/result.csv" (List.rev results)
+
+
+let () = write_file "data/result.csv" results
+
+let () = write_to_sqlite "data/result.db" results
 
