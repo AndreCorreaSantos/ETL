@@ -1,6 +1,6 @@
 open Types
 
-module IntMap = Map.Make(Int)
+module IntMap = Map.Make(Stdlib.Int)
 
 let inner_join (items: item list) (orders: order list) = 
   let get_order (item: item) = 
