@@ -74,6 +74,36 @@ let read_file filename =
     
     close_out channel
 
+let ( let* ) = Lwt.bind
+let http_get url =
+  let* (resp, body) =
+    Cohttp_lwt_unix.Client.get (Uri.of_string url)
+  in
+  let code = resp
+             |> Cohttp.Response.status
+             |> Cohttp.Code.code_of_status in
+  if Cohttp.Code.is_success code
+  then
+    let* b = Cohttp_lwt.Body.to_string body in
+    Lwt.return (Ok b)
+  else
+    Lwt.return (Error (
+      Cohttp.Code.reason_phrase_of_code code
+    ))
+
+
+let http_get_string url =
+  Lwt_main.run (
+    let* result = http_get url in
+    match result with
+    | Error str ->
+       Printf.printf "%s:fail\n" url;
+       Printf.printf "Error: %s\n" str;
+       exit 1
+    | Ok result ->
+       Lwt.return result
+  )
+
 
 
   

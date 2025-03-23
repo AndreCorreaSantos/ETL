@@ -1,4 +1,4 @@
 (library
  (name etl)
  (public_name etl)
- (libraries csv str))
+ (libraries csv str lwt cohttp-lwt-unix))
