@@ -2,6 +2,11 @@ open Types
 
 module IntMap = Map.Make(Stdlib.Int)
 
+(** Performs an inner join on items and orders.
+    @param items List of items
+    @param orders List of orders
+    @return List of joined order-item records
+*)
 let inner_join (items: item list) (orders: order list) = 
   let get_order (item: item) = 
     let order = List.find (fun order -> order.id = item.order_id) orders in
@@ -11,7 +16,10 @@ let inner_join (items: item list) (orders: order list) =
   in 
   List.map get_order items 
   
-
+(** Groups a list of intermediate results by order ID.
+    @param intermediate_results List of intermediate results
+    @return Map grouping results by order ID
+*)
 let group_by (intermediate_results: int_result list) =
   let add_to_map key value map =
     match IntMap.find_opt key map with
@@ -24,8 +32,10 @@ let group_by (intermediate_results: int_result list) =
   in
   List.fold_left (fun map x -> add_to_map x.order_id x map) IntMap.empty intermediate_results
 
- 
-
+(** Computes final results from intermediate results.
+    @param inter_results List of intermediate results
+    @return List of aggregated results
+*)
 let get_results (inter_results: int_result list) = 
     
   let order_items = group_by inter_results 
@@ -38,7 +48,3 @@ let get_results (inter_results: int_result list) =
   in
   
  IntMap.fold (fun _ items acc -> result_from_items items :: acc) order_items []
-
-
-
-

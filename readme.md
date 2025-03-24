@@ -11,9 +11,9 @@
 ## Requisitos Opcionais
 
 - [X] 1 Ler os dados de entrada em um arquivo estático na internet (exposto via http).
-- [ ] 2 Salvar os dados de saída em um Banco de Dados SQLite.
+- [X] 2 Salvar os dados de saída em um Banco de Dados SQLite.
 - [X] 3 É possível fazer o tratamento das tabelas de entrada em separado. Mas é desejável realizar o tratamento dos dados conjuntamente via operação de `inner join`. Ou seja, juntar as tabelas antes de iniciar a etapa de `Transform`.
 - [X] 4 Organizar o projeto ETL utilizando `dune`.
-- [ ] 5 Documentar todas as funções geradas via formato `docstring`.
+- [X] 5 Documentar todas as funções geradas via formato `docstring`.
 - [ ] 6 Realizar uma saída adicional que contém a média de receita e impostos pagos agrupados por mês e ano.
 - [ ] 7 Gerar arquivos de testes completos para as funções puras.
