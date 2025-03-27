@@ -143,6 +143,16 @@ let create_table (db : Sqlite3.db) =
     Printf.printf "Failed creating sqlite results db: %s\n" (Sqlite3.Rc.to_string err);
     exit 1
 
+(** Creates year month table in SQLite database.
+    @param db SQLite database handle
+*)
+let create_ym_table (db : Sqlite3.db) = 
+  match Sqlite3.exec db "CREATE TABLE IF NOT EXISTS ym_results (date TEXT PRIMARY KEY, avg_price FLOAT, avg_tax FLOAT)" with
+  | Sqlite3.Rc.OK -> ()  
+  | err ->
+    Printf.printf "Failed creating sqlite ym_results db: %s\n" (Sqlite3.Rc.to_string err);
+    exit 1
+
 (** Inserts a result into SQLite database.
     @param db SQLite database handle
     @param result Record to insert
@@ -156,13 +166,42 @@ let insert_result (db : Sqlite3.db) (result : result) =
   Sqlite3.finalize statement |> ignore;
   ()
 
+
+(** Inserts a result into SQLite database.
+    @param db SQLite database handle
+    @param result Record to insert
+*)
+let insert_ym_result (db : Sqlite3.db) (result : ym_result) = 
+  let statement = Sqlite3.prepare db "INSERT INTO ym_results (date, avg_price, avg_tax) VALUES (?, ?, ?)" in
+  Sqlite3.bind statement 1 (Sqlite3.Data.TEXT result.date) |> ignore;  
+  Sqlite3.bind statement 2 (Sqlite3.Data.FLOAT result.avg_price) |> ignore;
+  Sqlite3.bind statement 3 (Sqlite3.Data.FLOAT result.avg_tax) |> ignore;  
+  Sqlite3.step statement |> ignore;
+  Sqlite3.finalize statement |> ignore;
+  ()
+
 (** Writes results to an SQLite database.
     @param filename Path to the SQLite database file
     @param results List of result records to insert
 *)
-let write_to_sqlite (filename : string) (results : result list) = 
+(* let write_to_sqlite create_table_fun insert_fun filename results  = 
   let db = Sqlite3.db_open filename in
-  let () = create_table db in 
-  List.iter (fun result -> insert_result db result) results;
+  let () = create_table_fun db in 
+  List.iter (fun result -> insert_fun db result) results;
+  Sqlite3.db_close db |> ignore;
+  () *)
+let write_to_sqlite create_table_fun insert_fun filename results  = 
+  let db = Sqlite3.db_open filename in
+  let () = create_table_fun db in 
+  let num_results = List.length results in
+  Printf.printf "Number of results to insert: %d\n" num_results;
+  
+  List.iter (fun result -> 
+    try 
+      insert_fun db result
+    with 
+    | e -> Printf.printf "Error inserting result: %s\n" (Printexc.to_string e)
+  ) results;
+  
   Sqlite3.db_close db |> ignore;
   ()

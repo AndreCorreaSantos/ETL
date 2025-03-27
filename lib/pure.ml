@@ -1,5 +1,5 @@
 open Types
-
+module StringMap = Map.Make(Stdlib.String)
 module IntMap = Map.Make(Stdlib.Int)
 
 (** Performs an inner join on items and orders.
@@ -36,10 +36,8 @@ let group_by (intermediate_results: int_result list) =
     @param inter_results List of intermediate results
     @return List of aggregated results
 *)
-let get_results (inter_results: int_result list) = 
-    
-  let order_items = group_by inter_results 
-  in
+let get_results (order_items: int_result list IntMap.t) = 
+
   let result_from_items (order_items: int_result list) =
     let total_price = List.fold_left (fun acc it -> acc +. it.price *. float_of_int it.quantity) 0. order_items in
     let total_tax = List.fold_left (fun acc it -> acc +. it.tax *. total_price) 0. order_items in
@@ -48,3 +46,41 @@ let get_results (inter_results: int_result list) =
   in
   
  IntMap.fold (fun _ items acc -> result_from_items items :: acc) order_items []
+
+(** Groups a list of intermediate results by order_date (Year-month).
+    @param intermediate_results List of intermediate results
+    @return Map grouping results by order ID
+*)
+let group_by_ym (intermediate_results: int_result list) =
+  let add_to_map key value map =
+    match StringMap.find_opt key map with
+    | Some lst -> 
+        let new_lst = value :: lst in
+        StringMap.add key new_lst map
+    | None -> 
+        let new_lst = [value] in
+        StringMap.add key new_lst map
+  in
+  let get_year_month date = 
+    String.sub date 0 7
+  in
+  List.fold_left (fun map x -> add_to_map (get_year_month x.order_date) x map) StringMap.empty intermediate_results
+
+
+(** Computes final results from intermediate results.
+    @param inter_results List of intermediate results
+    @return List of aggregated results
+*)
+let get_ym_results (ym_items: int_result list StringMap.t) = 
+
+  let result_from_items (date : string) (ym_items: int_result list) =
+    let len = float_of_int (List.length ym_items) in
+    let total_price = List.fold_left (fun acc it -> acc +. it.price *. float_of_int it.quantity) 0. ym_items in
+    let total_tax = List.fold_left (fun acc it -> acc +. it.tax *. total_price) 0. ym_items in
+    { date = date; avg_price = total_price /. len; avg_tax = total_tax /. len } 
+  in
+  
+ StringMap.fold (fun date items acc -> result_from_items date items :: acc) ym_items []
+
+
+  

@@ -27,6 +27,12 @@ type result = {
   tax : float;
 }
 
+type ym_result = {
+  date : string;
+  avg_price : float;
+  avg_tax : float;
+}
+
 
 
 type item = {
