@@ -28,8 +28,8 @@ let () = write_file "data/result.csv" results
 
 
 
-let () = write_to_sqlite create_table insert_result "data/result.db" results 
+let db = create_db "data/results.db"
 
+let () = write_to_sqlite db results year_month_results
 
-let () = write_to_sqlite create_ym_table insert_ym_result "data/ym_result.db" year_month_results 
 

@@ -180,6 +180,12 @@ let insert_ym_result (db : Sqlite3.db) (result : ym_result) =
   Sqlite3.finalize statement |> ignore;
   ()
 
+let create_db filename =
+  let db = Sqlite3.db_open filename in
+  let () = create_table db in
+  let () = create_ym_table db in
+  db
+
 (** Writes results to an SQLite database.
     @param filename Path to the SQLite database file
     @param results List of result records to insert
@@ -190,18 +196,10 @@ let insert_ym_result (db : Sqlite3.db) (result : ym_result) =
   List.iter (fun result -> insert_fun db result) results;
   Sqlite3.db_close db |> ignore;
   () *)
-let write_to_sqlite create_table_fun insert_fun filename results  = 
-  let db = Sqlite3.db_open filename in
-  let () = create_table_fun db in 
-  let num_results = List.length results in
-  Printf.printf "Number of results to insert: %d\n" num_results;
+let write_to_sqlite db results ym_results = 
   
-  List.iter (fun result -> 
-    try 
-      insert_fun db result
-    with 
-    | e -> Printf.printf "Error inserting result: %s\n" (Printexc.to_string e)
-  ) results;
+  let () = List.iter (fun r -> insert_result db r) results in
+  let () = List.iter (fun ym_r -> insert_ym_result db ym_r) ym_results in
   
   Sqlite3.db_close db |> ignore;
   ()
