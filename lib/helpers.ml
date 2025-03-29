@@ -167,9 +167,9 @@ let insert_result (db : Sqlite3.db) (result : result) =
   ()
 
 
-(** Inserts a result into SQLite database.
+(** Inserts a year-month result into SQLite database.
     @param db SQLite database handle
-    @param result Record to insert
+    @param result Year-month record to insert
 *)
 let insert_ym_result (db : Sqlite3.db) (result : ym_result) = 
   let statement = Sqlite3.prepare db "INSERT INTO ym_results (date, avg_price, avg_tax) VALUES (?, ?, ?)" in
@@ -180,22 +180,21 @@ let insert_ym_result (db : Sqlite3.db) (result : ym_result) =
   Sqlite3.finalize statement |> ignore;
   ()
 
+(** Creates and initializes a SQLite database with required tables.
+    @param filename Path to the SQLite database file
+    @return Database handle for further operations
+*)
 let create_db filename =
   let db = Sqlite3.db_open filename in
   let () = create_table db in
   let () = create_ym_table db in
   db
 
-(** Writes results to an SQLite database.
-    @param filename Path to the SQLite database file
+(** Writes results and year-month results to an SQLite database.
+    @param db SQLite database handle
     @param results List of result records to insert
+    @param ym_results List of year-month result records to insert
 *)
-(* let write_to_sqlite create_table_fun insert_fun filename results  = 
-  let db = Sqlite3.db_open filename in
-  let () = create_table_fun db in 
-  List.iter (fun result -> insert_fun db result) results;
-  Sqlite3.db_close db |> ignore;
-  () *)
 let write_to_sqlite db results ym_results = 
   
   let () = List.iter (fun r -> insert_result db r) results in
