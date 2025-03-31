@@ -1,10 +1,6 @@
 open Etl.Parsers
 open Etl.Helpers
 open Etl.Transform
-
-
-
-
 let user_input = parse_user_input()
 let order_csv = http_get_string "https://raw.githubusercontent.com/AndreCorreaSantos/ETL/refs/heads/main/data/order.csv"
 

@@ -1,14 +1,23 @@
 open Types
 
 let ( let* ) = Result.bind
+
+(** Converts a status variant to its string representation.
+    @param status Status variant to convert (Complete, Pending, or Cancelled)
+    @return String representation of the status
+*)
 let show_status = function
   | Complete -> "Complete"
   | Pending -> "Pending"
   | Cancelled -> "Cancelled"
+
+(** Converts an origin variant to its string representation.
+    @param origin Origin variant to convert (O or P)
+    @return String representation of the origin
+*)
 let show_origin = function
   | O -> "O"
   | P -> "P"
-
 
 (** Parses an integer from a string.
     @param raw_int String containing an integer
@@ -145,7 +154,11 @@ let unwrap_items item_results =
   item_results
 
 
-
+(** Filters a list of orders based on user-specified status and origin criteria.
+    @param user_input Record containing status_filter and origin_filter strings
+    @param orders List of order records to filter
+    @return List of orders that match the specified filter criteria
+*)
 let filter_orders (user_input : user_input) (orders : order list) : order list =  
   let filter_order (user_input : user_input) (ord : order) = 
     let s_flag = match user_input.status_filter with
@@ -159,5 +172,3 @@ let filter_orders (user_input : user_input) (orders : order list) : order list =
     s_flag && o_flag
   in
   List.filter (fun ord -> filter_order user_input ord) orders
-
-

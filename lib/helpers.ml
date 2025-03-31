@@ -1,11 +1,16 @@
 open Types
 
+(** Reads the entire contents of a file into a string.
+    @param filename Path to the file to read
+    @return String containing the full contents of the file
+    @raise Sys_error if the file cannot be opened or read
+*)
 let read_file filename =
   let channel = open_in filename in
   let content = really_input_string channel (in_channel_length channel) in
   close_in channel;
   content
-
+  
 (** Writes results to a CSV file.
     @param filename Path to the output CSV file
     @param results List of result records to write
@@ -23,13 +28,11 @@ let write_file (filename : string) (results : result list) =
   
   let channel = open_out filename in
   
-  (* format string to csv line *)
   let row_to_csv_line row =
     let quote s = "\"" ^ String.escaped s ^ "\"" in
     String.concat ";" (List.map quote row) ^ "\n"
   in
   
-  (* write header and rows *)
   output_string channel (row_to_csv_line header);
   List.iter (fun row -> output_string channel (row_to_csv_line row)) rows;
   
@@ -144,7 +147,14 @@ let write_to_sqlite db results ym_results =
   Sqlite3.db_close db |> ignore;
   ()
 
-
+(** Parses user input to create filter criteria for origin and status.
+    Prompts the user to enter numeric choices for origin and status filters,
+    converting them into string representations.
+    @return Record containing origin_filter and status_filter strings
+    @raise Failure if the input cannot be parsed as an integer or if the input
+           value is not 0, 1, or 2 for either filter
+    @raise End_of_file if input is terminated prematurely
+*)
 let parse_user_input () =
   let () = Printf.printf "Type origin filter: \n 0 -> No filter \n 1 -> Online \n 2 -> Physical \n" in
   let origin_input = int_of_string (read_line ()) in

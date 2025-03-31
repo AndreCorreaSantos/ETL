@@ -1,7 +1,6 @@
 open OUnit2
 open Etl.Types
 
-
 module StringMap = Map.Make(Stdlib.String)
 module IntMap = Map.Make(Stdlib.Int)
 
@@ -31,7 +30,10 @@ let test_inner_join _ =
   assert_equal ~msg:"Second quantity" 1 (List.nth result 1).quantity;
   assert_equal ~msg:"First status" Complete (List.hd result).status;
   assert_equal ~msg:"Second origin" P (List.nth result 1).origin;
-  assert_raises (Not_found) (fun () -> Etl.Transform.inner_join [{ order_id = 3; quantity = 1; price = 1.0; tax = 0.1 }] sample_orders)
+  let result_no_match =
+    Etl.Transform.inner_join [{ order_id = 3; quantity = 1; price = 1.0; tax = 0.1 }] sample_orders
+  in
+  assert_equal ~msg:"No matching order, should return empty list" [] result_no_match
 
 let test_group_by _ =
   let result = Etl.Transform.group_by sample_int_results in

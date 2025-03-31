@@ -116,6 +116,41 @@ let test_unwrap_items _ =
   assert_equal item1 (List.nth unwrapped 0) ~msg:"First unwrapped item";
   assert_equal item2 (List.nth unwrapped 1) ~msg:"Second unwrapped item"
 
+let test_show_status _ =
+  assert_equal "Complete" (show_status Complete) ~msg:"Complete status string";
+  assert_equal "Pending" (show_status Pending) ~msg:"Pending status string";
+  assert_equal "Cancelled" (show_status Cancelled) ~msg:"Cancelled status string"
+
+let test_filter_orders _ =
+  let order1 = { id = 1; client_id = 100; order_date = "2023-01-15"; status = Complete; origin = O } in
+  let order2 = { id = 2; client_id = 200; order_date = "2023-02-20"; status = Pending; origin = P } in
+  let order3 = { id = 3; client_id = 300; order_date = "2023-03-10"; status = Cancelled; origin = O } in
+  let orders = [order1; order2; order3] in
+  
+  (* No filters *)
+  let user_input_no_filter = { origin_filter = ""; status_filter = "" } in
+  let result_no_filter = filter_orders user_input_no_filter orders in
+  assert_equal 3 (List.length result_no_filter) ~msg:"No filter should keep all orders";
+  assert_equal orders result_no_filter ~msg:"No filter should return original list";
+  
+  (* Status filter: Complete *)
+  let user_input_complete = { origin_filter = ""; status_filter = "Complete" } in
+  let result_complete = filter_orders user_input_complete orders in
+  assert_equal 1 (List.length result_complete) ~msg:"Complete filter should return 1 order";
+  assert_equal [order1] result_complete ~msg:"Complete filter should return only Complete order";
+  
+  (* Origin filter: P *)
+  let user_input_p = { origin_filter = "P"; status_filter = "" } in
+  let result_p = filter_orders user_input_p orders in
+  assert_equal 1 (List.length result_p) ~msg:"P origin filter should return 1 order";
+  assert_equal [order2] result_p ~msg:"P origin filter should return only P order";
+  
+  (* Both filters: Complete and O *)
+  let user_input_both = { origin_filter = "O"; status_filter = "Complete" } in
+  let result_both = filter_orders user_input_both orders in
+  assert_equal 1 (List.length result_both) ~msg:"Complete and O filter should return 1 order";
+  assert_equal [order1] result_both ~msg:"Complete and O filter should return matching order"
+
 let suite =
   "Parsers Test Suite" >::: [
     "parse_int" >:: test_parse_int;
@@ -128,6 +163,8 @@ let suite =
     "parse_orders" >:: test_parse_orders;
     "unwrap_orders" >:: test_unwrap_orders;
     "unwrap_items" >:: test_unwrap_items;
+    "show_status" >:: test_show_status;
+    "filter_orders" >:: test_filter_orders;
   ]
 
 let () =
