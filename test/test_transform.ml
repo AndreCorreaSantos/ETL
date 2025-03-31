@@ -62,7 +62,7 @@ let test_get_ym_results _ =
   assert_equal ~msg:"Results length" 2 (List.length results);
   let jan_result = List.find (fun r -> r.date = "2023-01") results in
   assert_equal ~msg:"Jan avg price" 17.5 jan_result.avg_price;
-  assert_equal ~msg:"Jan avg tax" 3.5 jan_result.avg_tax;  (* Corrected from 1.75 *)
+  assert_equal ~msg:"Jan avg tax" 3.5 jan_result.avg_tax;
   assert_bool "Empty map" (Etl.Transform.get_ym_results StringMap.empty = [])
 
 let suite =

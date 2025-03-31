@@ -1,3 +1,7 @@
 (test
  (name test_transform)
  (libraries ounit2 etl))
+
+(test
+ (name test_parsers)
+ (libraries ounit2 etl csv))

@@ -3,8 +3,12 @@ open Etl.Helpers
 open Etl.Transform
 
 
+
+
+let () = ignore(parse_user_input())
 let order_csv = http_get_string "https://raw.githubusercontent.com/AndreCorreaSantos/ETL/refs/heads/main/data/order.csv"
 let item_csv = http_get_string "https://raw.githubusercontent.com/AndreCorreaSantos/ETL/refs/heads/main/data/order_item.csv"
+
 
 let orders = unwrap_orders (parse_orders order_csv)
 

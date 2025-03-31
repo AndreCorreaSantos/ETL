@@ -114,3 +114,26 @@ let parse_orders csv_str =
   |> Csv.of_string ~has_header:true
   |> Csv.Rows.input_all
   |> List.map parse_row
+
+
+(** Filters out errors, returning only successful orders.
+    @param order_results List of order results
+    @return List of successful orders
+*)
+let unwrap_orders order_results =
+  List.filter_map (function
+    | Ok order -> Some order
+    | Error _ -> None) 
+  order_results
+
+(** Filters out errors, returning only successful items.
+    @param item_results List of item results
+    @return List of successful items
+*)
+let unwrap_items item_results = 
+  List.filter_map (function
+  | Ok item -> Some item
+  | Error _ -> None)
+  item_results
+
+

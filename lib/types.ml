@@ -52,3 +52,9 @@ type int_result = {
   price : float;
   tax : float;
 }
+
+
+type user_input = {
+  origin_filter : int;
+  status_filter : int;
+}

@@ -37,26 +37,6 @@ let print_orders orders =  List.iter (function
       print_endline "Unknown_origin"
     ) orders
 
-(** Filters out errors, returning only successful orders.
-    @param order_results List of order results
-    @return List of successful orders
-*)
-let unwrap_orders order_results =
-  List.filter_map (function
-    | Ok order -> Some order
-    | Error _ -> None) 
-  order_results
-
-(** Filters out errors, returning only successful items.
-    @param item_results List of item results
-    @return List of successful items
-*)
-let unwrap_items item_results = 
-  List.filter_map (function
-  | Ok item -> Some item
-  | Error _ -> None)
-  item_results
-
 (** Reads entire file contents.
     @param filename Path to the file
     @return String containing file contents
@@ -202,3 +182,28 @@ let write_to_sqlite db results ym_results =
   
   Sqlite3.db_close db |> ignore;
   ()
+
+
+let parse_user_input () =
+  let () = Printf.printf "Type origin filter: \n 0 -> No filter \n 1 -> Online \n 2 -> Physical \n" in
+  let origin_input = int_of_string (read_line ()) in
+  let () = Printf.printf "Type status filter: \n 0 -> No filter \n 1 -> Pending \n 2 -> Completed \n" in
+  let status_input = int_of_string (read_line ()) in
+  
+  (* Validate origin *)
+  let origin_filter = match origin_input with
+    | 0 -> 0
+    | 1 -> 1
+    | 2 -> 2
+    | _ -> failwith "Invalid origin filter: must be 0, 1, or 2"
+  in
+  
+  (* Validate status *)
+  let status_filter = match status_input with
+    | 0 -> 0
+    | 1 -> 1
+    | 2 -> 2
+    | _ -> failwith "Invalid status filter: must be 0, 1, or 2"
+  in {origin_filter = origin_filter; status_filter = status_filter}
+
+
