@@ -1,6 +1,14 @@
 open Types
 
 let ( let* ) = Result.bind
+let show_status = function
+  | Complete -> "Complete"
+  | Pending -> "Pending"
+  | Cancelled -> "Cancelled"
+let show_origin = function
+  | O -> "O"
+  | P -> "P"
+
 
 (** Parses an integer from a string.
     @param raw_int String containing an integer
@@ -135,5 +143,21 @@ let unwrap_items item_results =
   | Ok item -> Some item
   | Error _ -> None)
   item_results
+
+
+
+let filter_orders (user_input : user_input) (orders : order list) : order list =  
+  let filter_order (user_input : user_input) (ord : order) = 
+    let s_flag = match user_input.status_filter with
+      | "" -> true
+      | _ -> user_input.status_filter = show_status ord.status
+    in
+    let o_flag = match user_input.origin_filter with
+      | "" -> true
+      | _ -> user_input.origin_filter = show_origin ord.origin
+    in 
+    s_flag && o_flag
+  in
+  List.filter (fun ord -> filter_order user_input ord) orders
 
 

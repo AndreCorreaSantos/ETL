@@ -1,16 +1,8 @@
 
 type status = Complete | Pending | Cancelled
 
-let show_status = function
-  | Complete -> "Complete"
-  | Pending -> "Pending"
-  | Cancelled -> "Cancelled"
-
 type origin = P | O 
 
-let show_origin = function
-  | O -> "O"
-  | P -> "P"
 
 type order = {
   id : int;
@@ -55,6 +47,6 @@ type int_result = {
 
 
 type user_input = {
-  origin_filter : int;
-  status_filter : int;
+  origin_filter : string;
+  status_filter : string;
 }

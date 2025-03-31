@@ -16,4 +16,4 @@
 - [X] 4 Organizar o projeto ETL utilizando `dune`.
 - [X] 5 Documentar todas as funções geradas via formato `docstring`.
 - [X] 6 Realizar uma saída adicional que contém a média de receita e impostos pagos agrupados por mês e ano.
-- [ ] 7 Gerar arquivos de testes completos para as funções puras.
+- [X] 7 Gerar arquivos de testes completos para as funções puras.

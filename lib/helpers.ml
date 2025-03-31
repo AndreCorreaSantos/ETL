@@ -1,46 +1,5 @@
 open Types
 
-(** Prints items, handling successful and error cases.
-    @param items List of items wrapped in result type
-*)
-let print_items items = List.iter (function
-  | Ok item ->
-      Printf.printf "%d %d %f %f\n"
-        item.order_id
-        item.quantity
-        item.price
-        item.tax
-  | Error `Invalid_int ->
-      print_endline "Invalid_int"
-  | Error `Invalid_float ->
-      print_endline "Invalid_float"
-    ) items
-
-(** Prints orders, handling successful and error cases.
-    @param orders List of orders wrapped in result type
-*)
-let print_orders orders =  List.iter (function
-  | Ok order ->
-      Printf.printf "%d %d %s %s %s\n"
-        order.id
-        order.client_id
-        order.order_date
-        (show_status order.status)
-        (show_origin order.origin)
-  | Error `Invalid_id ->
-      print_endline "Invalid_id"
-  | Error `Invalid_date ->
-      print_endline "Invalid_date"
-  | Error `Unknown_status ->
-      print_endline "Unknown_status"
-  | Error `Unknown_origin ->
-      print_endline "Unknown_origin"
-    ) orders
-
-(** Reads entire file contents.
-    @param filename Path to the file
-    @return String containing file contents
-*)
 let read_file filename =
   let channel = open_in filename in
   let content = really_input_string channel (in_channel_length channel) in
@@ -166,6 +125,8 @@ let insert_ym_result (db : Sqlite3.db) (result : ym_result) =
 *)
 let create_db filename =
   let db = Sqlite3.db_open filename in
+  Sqlite3.exec db "DROP TABLE IF EXISTS results" |> ignore;
+  Sqlite3.exec db "DROP TABLE IF EXISTS ym_results" |> ignore;
   let () = create_table db in
   let () = create_ym_table db in
   db
@@ -189,20 +150,16 @@ let parse_user_input () =
   let origin_input = int_of_string (read_line ()) in
   let () = Printf.printf "Type status filter: \n 0 -> No filter \n 1 -> Pending \n 2 -> Completed \n" in
   let status_input = int_of_string (read_line ()) in
-  
-  (* Validate origin *)
   let origin_filter = match origin_input with
-    | 0 -> 0
-    | 1 -> 1
-    | 2 -> 2
+    | 0 -> ""
+    | 1 -> "O"
+    | 2 -> "P"
     | _ -> failwith "Invalid origin filter: must be 0, 1, or 2"
   in
-  
-  (* Validate status *)
   let status_filter = match status_input with
-    | 0 -> 0
-    | 1 -> 1
-    | 2 -> 2
+    | 0 -> ""
+    | 1 -> "Pending"
+    | 2 -> "Complete"
     | _ -> failwith "Invalid status filter: must be 0, 1, or 2"
   in {origin_filter = origin_filter; status_filter = status_filter}
 

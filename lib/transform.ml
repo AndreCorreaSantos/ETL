@@ -8,14 +8,18 @@ module IntMap = Map.Make(Stdlib.Int)
     @return List of joined order-item records
 *)
 let inner_join (items: item list) (orders: order list) = 
-  let get_order (item: item) = 
-    let order = List.find (fun order -> order.id = item.order_id) orders in
-    { order_id = order.id; client_id = order.client_id; 
-    order_date = order.order_date; status = order.status; origin = order.origin;
-    quantity = item.quantity; price = item.price; tax = item.tax;  }
+  let get_order_info (item: item) = 
+    match List.find_opt (fun order -> order.id = item.order_id) orders with
+    | Some order -> 
+        Some { order_id = order.id; client_id = order.client_id; 
+               order_date = order.order_date; status = order.status; 
+               origin = order.origin; quantity = item.quantity; 
+               price = item.price; tax = item.tax }
+    | None -> None
   in 
-  List.map get_order items 
-  
+  List.filter_map get_order_info items
+
+
 (** Groups a list of intermediate results by order ID.
     @param intermediate_results List of intermediate results
     @return Map grouping results by order ID
@@ -81,6 +85,4 @@ let get_ym_results (ym_items: int_result list StringMap.t) =
   in
   
  StringMap.fold (fun date items acc -> result_from_items date items :: acc) ym_items []
-
-
   
