@@ -3,7 +3,6 @@ open Types
 (** Reads the entire contents of a file into a string.
     @param filename Path to the file to read
     @return String containing the full contents of the file
-    @raise Sys_error if the file cannot be opened or read
 *)
 let read_file filename =
   let channel = open_in filename in
@@ -151,9 +150,7 @@ let write_to_sqlite db results ym_results =
     Prompts the user to enter numeric choices for origin and status filters,
     converting them into string representations.
     @return Record containing origin_filter and status_filter strings
-    @raise Failure if the input cannot be parsed as an integer or if the input
-           value is not 0, 1, or 2 for either filter
-    @raise End_of_file if input is terminated prematurely
+
 *)
 let parse_user_input () =
   let () = Printf.printf "Type origin filter: \n 0 -> No filter \n 1 -> Online \n 2 -> Physical \n" in
