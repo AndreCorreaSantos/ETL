@@ -1,4 +1,4 @@
-name: Build and Deploy Docs
+name: Build and Deploy OCaml Docs
 
 on:
   push:
@@ -7,7 +7,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -17,6 +18,11 @@ jobs:
         with:
           ocaml-compiler: '5.2.0'
           dune-cache: true
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap darcs g++-multilib gcc-multilib mercurial musl-tools rsync
 
       - name: Install dependencies
         run: opam install odoc
