@@ -1,3 +1,14 @@
+# ETL - EXTRACT, TRANSFORM, LOAD
+
+
+### Extraction
+Extraction is the first step in an etl pipeline, it involves ingesting it from a database or data source. In this project the data can be read
+from a local file or from a given http url. It must be noted, however, that this data must be in a csv format.
+
+The main functions in this step are the 
+
+
+
 ## Requisitos do Projeto
 
 - [X] 1 O projeto precisa ser feito em OCaml.
