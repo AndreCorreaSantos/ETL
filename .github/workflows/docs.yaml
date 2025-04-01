@@ -1,0 +1,32 @@
+name: Build and Deploy Docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install OCaml and Dune
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-version: '5.0'
+          dune-cache: true
+
+      - name: Install dependencies
+        run: opam install odoc
+
+      - name: Build documentation
+        run: dune build @doc
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: _build/default/_doc/_html
+
