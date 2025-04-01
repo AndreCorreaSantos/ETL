@@ -1,5 +1,8 @@
 open Types
 
+
+let ( let* ) = Lwt.bind
+
 (** Reads the entire contents of a file into a string.
     @param filename Path to the file to read
     @return String containing the full contents of the file
@@ -41,7 +44,6 @@ let write_file (filename : string) (results : result list) =
     @param url URL to fetch
     @return Lwt promise containing result or error message
 *)
-let ( let* ) = Lwt.bind
 let http_get url =
   let* (resp, body) =
     Cohttp_lwt_unix.Client.get (Uri.of_string url)
@@ -58,7 +60,7 @@ let http_get url =
       Cohttp.Code.reason_phrase_of_code code
     ))
 
-(** Runs HTTP GET and handles result.
+(** Runs HTTP GET and handles result. Wrapper on the http_get function.
     @param url URL to fetch
     @return String containing response body or exits on failure
 *)
