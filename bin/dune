@@ -1,5 +1,0 @@
-(executable
- (public_name etl)
- (name main)
- (modules main)
- (libraries etl))
