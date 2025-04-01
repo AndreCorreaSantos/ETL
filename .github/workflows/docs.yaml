@@ -15,7 +15,7 @@ jobs:
       - name: Install OCaml and Dune
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-version: '5.0'
+          ocaml-compiler: '5.2.0'
           dune-cache: true
 
       - name: Install dependencies
@@ -29,4 +29,3 @@ jobs:
         with:
           branch: gh-pages
           folder: _build/default/_doc/_html
-
