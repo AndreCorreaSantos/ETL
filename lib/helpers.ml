@@ -3,7 +3,7 @@ open Types
 
 let ( let* ) = Lwt.bind
 
-(** Reads the entire contents of a file into a string. TESTING
+(** Reads the entire contents of a file into a string.
     @param filename Path to the file to read
     @return String containing the full contents of the file
 *)
