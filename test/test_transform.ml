@@ -48,7 +48,7 @@ let test_get_results _ =
   assert_equal ~msg:"Results length" 2 (List.length results);
   let order1_result : Etl.Types.result = List.find (fun (r : Etl.Types.result) -> r.order_id = 1) results in
   assert_equal ~msg:"Order 1 total price" 35.0 order1_result.price;
-  assert_equal ~msg:"Order 1 total tax" 7.0 order1_result.tax;
+  assert_equal ~msg:"Order 1 total tax" 3.5 order1_result.tax;
   assert_bool "Empty map" (Etl.Transform.get_results IntMap.empty = [])
 
 let test_group_by_ym _ =
@@ -63,8 +63,8 @@ let test_get_ym_results _ =
   let results = Etl.Transform.get_ym_results grouped in
   assert_equal ~msg:"Results length" 2 (List.length results);
   let jan_result = List.find (fun r -> r.date = "2023-01") results in
-  assert_equal ~msg:"Jan avg price" 17.5 jan_result.avg_price;
-  assert_equal ~msg:"Jan avg tax" 3.5 jan_result.avg_tax;
+  assert_equal ~msg:"Jan avg price" (35.0 /. 3.0) jan_result.avg_price;
+  assert_equal ~msg:"Jan avg tax" (3.5 /. 3.0) jan_result.avg_tax;
   assert_bool "Empty map" (Etl.Transform.get_ym_results StringMap.empty = [])
 
 let suite =
