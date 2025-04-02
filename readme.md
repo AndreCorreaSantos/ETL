@@ -13,17 +13,17 @@ Extraction is the first step in an etl pipeline, it involves ingesting it from a
 The first step in the program's execution is to prompt the user for the order filters - which are read from the terminal by the function [parse_user_input](https://andrecorreasantos.github.io/ETL/etl/Etl/Helpers/index.html#val-parse_user_input).
 
 ```sh
-Type origin filter:            
- 0 -> No filter 
- 1 -> Online 
- 2 -> Physical 
+Type origin filter:
+ 0 -> No filter
+ 1 -> Online
+ 2 -> Physical
 ```
 
 ```sh
-Type status filter: 
- 0 -> No filter 
- 1 -> Pending 
- 2 -> Completed 
+Type status filter:
+ 0 -> No filter
+ 1 -> Pending
+ 2 -> Completed
 ```
 
 The provided filters are stored in a record called [user_input](https://andrecorreasantos.github.io/ETL/etl/Etl/Types/index.html#type-user_input) and then used in a latter step to eliminate orders which don't equal the desired fields.
@@ -108,9 +108,10 @@ These [int_result](https://andrecorreasantos.github.io/ETL/etl/Etl/Types/index.h
 
 ### 2.3 Get Results
 
-The order results are then calculated. Each result is a record that contains a `total_price` field that is calculated by summing the price of all of its items, and a `total_tax` field which is the total_tax payed in that order -  which is calculated by summing up all of the item prices times their tax rate.
+The order results are then calculated. Each result is a record that contains a `total_price` field that is calculated by summing the price of all of its items, and a `total_tax` field which is the total_tax payed in that order - which is calculated by summing up all of the item prices times their tax rate.
 These result fields are obtained with Fold Left operations which end up reversing the final record list, so a List.rev is needed to return them to their original order.
 This can all be seen in the code for the [get_results](https://andrecorreasantos.github.io/ETL/etl/Etl/Transform/index.html#val-get_results) function.
+
 ```ocaml
 type result = {
 
@@ -133,29 +134,34 @@ The same aforementioned [int_result](https://andrecorreasantos.github.io/ETL/etl
 
 ### 2.5 Get year_month Results
 
-The same logic described in 2.3 is applied to the the year_month items in order to obtain [ym_results](https://andrecorreasantos.github.io/ETL/etl/Etl/Types/index.html#type-ym_result) - which contain the same fields as the `results` records but have a `string` identifier called `date`.
+The same logic described in 2.3 is applied to the the year_month items in order to obtain [ym_results](https://andrecorreasantos.github.io/ETL/etl/Etl/Types/index.html#type-ym_result) - which contain the same fields as the `results` records but have a `string` identifier called `date`. It must be noted that instead of calculating the total order price and tax as is done in 2.3, this step calculates the average price and average tax for all of the items in orders which are grouped by year-month.
+
 ```ocaml
 type ym_result = {
 
     date : string;
-    price : float;
-    tax : float;
+    avg_price : float;
+    avg_tax : float;
 
 }
 ```
-The function which performs the total_price and total_tax calculations for the year_month items is called [get_ym_results](https://andrecorreasantos.github.io/ETL/etl/Etl/Transform/index.html#val-get_ym_results)
+
+The function which performs the avg_price and avg_tax calculations for the year_month items is called [get_ym_results](https://andrecorreasantos.github.io/ETL/etl/Etl/Transform/index.html#val-get_ym_results).
 
 ## 3. Load
 
-In principle, the loading step of an ETL requires loading the processed data into a target system. In this project, the target is an Sqlite3 database. 
+In principle, the loading step of an ETL requires loading the processed data into a target system. In this project, the target is an Sqlite3 database.
 In this project, there are two lists of records that must be written into the output DB, they are the [results](https://andrecorreasantos.github.io/ETL/etl/Etl/Transform/index.html#val-get_results) list and the [ym_results](https://andrecorreasantos.github.io/ETL/etl/Etl/Types/index.html#type-ym_result) list.
-
 
 ### 3.1 Creating the Db file
 
-### 3.2 Creating the tables
+The .db file is created by the [create_db](https://andrecorreasantos.github.io/ETL/etl/Etl/Helpers/index.html#val-create_db) function, which creates the file itself and calls two other functions [create_table](https://andrecorreasantos.github.io/ETL/etl/Etl/Helpers/index.html#val-create_table) and [create_ym_table](https://andrecorreasantos.github.io/ETL/etl/Etl/Helpers/index.html#val-create_ym_table) in order to create a table to store the normal `results` and the `ym_results`. This function returns a db handle that is used in writing to the created tables.
 
 ### 3.3 writing to the tables
+
+The db handle returned by the previous step is then received as an argument by the [write_to_sqlite](https://andrecorreasantos.github.io/ETL/etl/Etl/Helpers/index.html#val-write_to_sqlite) alongside the `results` and `ym_results` and so `write_to_sqlite` iterates over both lists of results and calls their respective insert functions ([insert_result](https://andrecorreasantos.github.io/ETL/etl/Etl/Helpers/index.html#val-insert_result) and [insert_ym_result](https://andrecorreasantos.github.io/ETL/etl/Etl/Helpers/index.html#val-insert_ym_result)) to write each iterated record to a table.
+
+Finally, after writing all of the `result` and `ym_result` records, the db is closed and the program execution finishes.
 
 ## 4. Building
 
@@ -195,7 +201,9 @@ dune exec bin/main.exe
 
 ## 5. Testing
 
-Unit tests are essential to guarantee that the business logic is functioning as planned. In this project ocaml's Ounit2 test library was used and all of the project's pure functions were covered. These can be seen in the [parsers](https://andrecorreasantos.github.io/ETL/etl/Etl/Parsers/index.html) and [transform](https://andrecorreasantos.github.io/ETL/etl/Etl/Transform/index.html) modules. A few test examples were written for the functions and claude was used to generalize those to all functions.
+A pure function always produces the same output for a given input and does not read or modify any external state. This means it is both deterministic and free of side effects.
+
+Unit tests are essential for ensuring that business logic behaves as expected. In this project, OCaml's OUnit2 testing library was used to cover all pure functions. These functions are primarily found in the [Parsers](https://andrecorreasantos.github.io/ETL/etl/Etl/Parsers/index.html) and [Transform](https://andrecorreasantos.github.io/ETL/etl/Etl/Transform/index.html) modules. A few test cases were initially written for selected functions, and Claude was used to generalize them to cover all functions.
 
 To run said tests, one can run:
 
@@ -218,20 +226,20 @@ The written tests can be read in the [test/](https://github.com/AndreCorreaSanto
 
 ## Project Requirements
 
-- [X] 1 The project must be implemented in OCaml.
-- [X] 2 To compute the output, it is necessary to use `map`, `reduce`, and `filter`.
-- [X] 3 The code must include functions for reading and writing CSV files. This will result in impure functions.
-- [X] 4 Separate impure functions from pure functions in the project files.
-- [X] 5 The input must be loaded into a list structure of `Record`.
-- [X] 6 The use of `Helper Functions` is mandatory for loading fields into a `Record`.
-- [X] 7 A project report must be written, explaining how each step was implemented. This serves as a guide for someone who might want to replicate the project in the future. You must declare whether or not Generative AI was used in this report.
+- [x] 1 The project must be implemented in OCaml.
+- [x] 2 To compute the output, it is necessary to use `map`, `reduce`, and `filter`.
+- [x] 3 The code must include functions for reading and writing CSV files. This will result in impure functions.
+- [x] 4 Separate impure functions from pure functions in the project files.
+- [x] 5 The input must be loaded into a list structure of `Record`.
+- [x] 6 The use of `Helper Functions` is mandatory for loading fields into a `Record`.
+- [x] 7 A project report must be written, explaining how each step was implemented. This serves as a guide for someone who might want to replicate the project in the future. You must declare whether or not Generative AI was used in this report.
 
 ## Optional Requirements
 
-- [X] 1 Read the input data from a static file available on the internet (exposed via HTTP).
-- [X] 2 Save the output data in an SQLite database.
-- [X] 3 It is possible to process input tables separately, but it is preferable to process the data together using an `inner join` operation. In other words, join the tables before starting the `Transform` step.
-- [X] 4 Organize the ETL project using `dune`.
-- [X] 5 Document all generated functions using the `docstring` format.
-- [X] 6 Produce an additional output that contains the average revenue and taxes paid, grouped by month and year.
-- [X] 7 Generate complete test files for the pure functions.
+- [x] 1 Read the input data from a static file available on the internet (exposed via HTTP).
+- [x] 2 Save the output data in an SQLite database.
+- [x] 3 It is possible to process input tables separately, but it is preferable to process the data together using an `inner join` operation. In other words, join the tables before starting the `Transform` step.
+- [x] 4 Organize the ETL project using `dune`.
+- [x] 5 Document all generated functions using the `docstring` format.
+- [x] 6 Produce an additional output that contains the average revenue and taxes paid, grouped by month and year.
+- [x] 7 Generate complete test files for the pure functions.

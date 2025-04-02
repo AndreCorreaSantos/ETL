@@ -3,7 +3,6 @@ type status = Complete | Pending | Cancelled
 
 type origin = P | O 
 
-
 type order = {
   id : int;
   client_id : int;
@@ -11,7 +10,6 @@ type order = {
   status : status; 
   origin : origin;
 }
-
 
 type result = {
   order_id : int;
@@ -24,8 +22,6 @@ type ym_result = {
   avg_price : float;
   avg_tax : float;
 }
-
-
 
 type item = {
   order_id : int;
@@ -44,7 +40,6 @@ type int_result = {
   price : float;
   tax : float;
 }
-
 
 type user_input = {
   origin_filter : string;
