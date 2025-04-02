@@ -44,7 +44,7 @@ let get_results (order_items: int_result list IntMap.t) =
 
   let result_from_items (order_items: int_result list) =
     let total_price = List.fold_left (fun acc it -> acc +. it.price *. float_of_int it.quantity) 0. order_items in
-    let total_tax = List.fold_left (fun acc it -> acc +. it.tax *. total_price) 0. order_items in
+    let total_tax = List.fold_left (fun acc it -> acc +. it.tax *. (it.price *. float_of_int it.quantity)) 0. order_items in
     let order_id = (List.hd order_items).order_id in
     { order_id = order_id; price = total_price; tax = total_tax } 
   in
@@ -80,7 +80,7 @@ let get_ym_results (ym_items: int_result list StringMap.t) =
   let result_from_items (date : string) (ym_items: int_result list) =
     let len = float_of_int (List.length ym_items) in
     let total_price = List.fold_left (fun acc it -> acc +. it.price *. float_of_int it.quantity) 0. ym_items in
-    let total_tax = List.fold_left (fun acc it -> acc +. it.tax *. total_price) 0. ym_items in
+    let total_tax = List.fold_left (fun acc it -> acc +. it.tax  *. (it.price *. float_of_int it.quantity)) 0. ym_items in
     { date = date; avg_price = total_price /. len; avg_tax = total_tax /. len } 
   in
   
